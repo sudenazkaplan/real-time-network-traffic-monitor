@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>NetWatch</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="9" width="2" height="5" rx="1" fill="white"/>
+          <rect x="5.5" y="6" width="2" height="8" rx="1" fill="white"/>
+          <rect x="9" y="3" width="2" height="11" rx="1" fill="white"/>
+          <rect x="12.5" y="7" width="2" height="7" rx="1" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">NetWatch</div>
+        <div class="brand-sub">Real-time traffic monitor</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="live-pill"><div class="dot-live"></div>Live</div>
+      <div class="iface-badge" id="iface-label">Wi-Fi</div>
+    </div>
+  </div>
+
+  <!-- Metrik kartlar -->
+  <div class="metric-grid">
+    <div class="mc">
+      <div class="label">Inbound</div>
+      <div class="val"><span id="mbps">0</span> <span class="unit">Mbps</span></div>
+      <div class="trend" id="mbps-trend">—</div>
+    </div>
+    <div class="mc">
+      <div class="label">Packets / sec</div>
+      <div class="val" id="pps">0</div>
+      <div class="trend trend-up">canlı yakalama</div>
+    </div>
+    <div class="mc">
+      <div class="label">Active hosts</div>
+      <div class="val" id="hosts">0</div>
+      <div class="trend">subnet üzerinde</div>
+    </div>
+    <div class="mc">
+      <div class="label">Top protocol</div>
+      <div class="val" id="top-proto" style="font-size:18px">—</div>
+      <div class="trend" id="top-proto-pct">—</div>
+    </div>
+  </div>
+
+  <!-- Grafik + Protokol -->
+  <div class="row2">
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Live throughput</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="legend">
+            <span><span class="leg-dot" style="background:#0a84ff"></span>Inbound</span>
+          </div>
+          <span class="card-meta" id="bps-badge">0 Mbps</span>
+        </div>
+      </div>
+      <div style="position:relative;height:160px">
+        <canvas id="chart-live"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Protocols</span>
+        <span class="card-meta" id="proto-total">0 pkts</span>
+      </div>
+      <div style="position:relative;height:100px">
+        <canvas id="chart-proto"></canvas>
+      </div>
+      <div class="proto-rows">
+        <div class="prow"><span class="pname">TCP</span><div class="ptrack"><div class="pbar" id="bar-tcp" style="width:0%;background:#0a84ff"></div></div><span class="ppct" id="pct-tcp">0%</span></div>
+        <div class="prow"><span class="pname">UDP</span><div class="ptrack"><div class="pbar" id="bar-udp" style="width:0%;background:#30d158"></div></div><span class="ppct" id="pct-udp">0%</span></div>
+        <div class="prow"><span class="pname">ICMP</span><div class="ptrack"><div class="ptrack"><div class="pbar" id="bar-icmp" style="width:0%;background:#ff9500"></div></div><span class="ppct" id="pct-icmp">0%</span></div></div>
+        <div class="prow"><span class="pname">Other</span><div class="ptrack"><div class="pbar" id="bar-other" style="width:0%;background:#aeaeb2"></div></div><span class="ppct" id="pct-other">0%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top talkers + Alerts -->
+  <div class="row3">
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Top talkers</span>
+        <span class="card-meta" id="talker-count">0 hosts</span>
+      </div>
+      <table class="talker-tbl">
+        <thead><tr>
+          <th style="width:38%">IP</th>
+          <th style="width:18%">Proto</th>
+          <th style="width:22%">Bytes</th>
+          <th style="width:22%">Share</th>
+        </tr></thead>
+        <tbody id="talker-body"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Alerts</span>
+        <span class="card-meta danger" id="alert-count">0 active</span>
+      </div>
+      <div class="alerts" id="alert-list">
+        <div class="alert alert-i">
+          <div class="adot adot-i"></div>
+          <div class="alert-txt">Sistem başlatıldı, trafik izleniyor…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

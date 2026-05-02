@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  netwatch:
+    build: .
+    ports:
+      - "5000:5000"
+    network_mode: host # paket yakalama için host ağı gerekli
+    volumes:
+      - ./data:/app/backend/data
+    restart: unless-stopped

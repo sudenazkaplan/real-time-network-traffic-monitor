@@ -1,0 +1,6 @@
+scapy
+flask
+flask-socketio
+flask-cors
+scikit-learn
+numpy
