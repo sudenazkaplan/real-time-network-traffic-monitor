@@ -27,8 +27,12 @@ def packet_callback(packet):
             captured_packets.append(info)
 
 def start_capture(interface="Wi-Fi"):
-    thread = threading.Thread(
-        target=lambda: sniff(iface=interface, prn=packet_callback, store=False),
-        daemon=True
-    )
+    def _sniff():
+        try:
+            sniff(iface=interface, prn=packet_callback, store=False)
+        except Exception as e:
+            print(f"[!] Capture failed ({e}) — running in demo mode")
+
+    thread = threading.Thread(target=_sniff, daemon=True)
     thread.start()
+    print(f"[+] Capture started on {interface}")

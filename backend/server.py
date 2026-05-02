@@ -1,6 +1,5 @@
 from anomaly import detector
 from flask import Flask, send_from_directory, request, jsonify
-from flask import Flask, send_from_directory
 from flask_socketio import SocketIO
 from flask_cors import CORS
 import threading, time, os
@@ -23,25 +22,6 @@ def index():
 def static_files(path):
     return send_from_directory("../frontend", path)
 
-def broadcast_loop():
-    while True:
-        stats = get_stats(window_seconds=2)
-        save_stats(stats)
-
-        # ML anomali kontrolü
-        detector.add(stats["mbps"], stats["pps"])
-        ml_alerts = detector.check(stats["mbps"], stats["pps"])
-        stats["ml_alerts"] = ml_alerts
-
-        socketio.emit("traffic_update", stats)
-        time.sleep(1)
-
-if __name__ == "__main__":
-    start_capture(interface="Wi-Fi")
-    t = threading.Thread(target=broadcast_loop, daemon=True)
-    t.start()
-    socketio.run(app, host="0.0.0.0", port=5000, debug=False)
-
 @app.route("/api/history")
 def history():
     minutes = int(request.args.get("minutes", 60))
@@ -51,4 +31,20 @@ def history():
         "active_hosts": r[3], "tcp": r[4], "udp": r[5],
         "icmp": r[6], "other": r[7]
     } for r in rows]
-    return {"history": data}
+    return jsonify({"history": data})
+
+def broadcast_loop():
+    while True:
+        stats = get_stats(window_seconds=2)
+        save_stats(stats)
+        detector.add(stats["mbps"], stats["pps"])
+        ml_alerts = detector.check(stats["mbps"], stats["pps"])
+        stats["ml_alerts"] = ml_alerts
+        socketio.emit("traffic_update", stats)
+        time.sleep(1)
+
+if __name__ == "__main__":
+    start_capture(interface="Wi-Fi")
+    t = threading.Thread(target=broadcast_loop, daemon=True)
+    t.start()
+    socketio.run(app, host="0.0.0.0", port=5000, debug=False, allow_unsafe_werkzeug=True)
